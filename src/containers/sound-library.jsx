@@ -22,27 +22,27 @@ class SoundLibrary extends React.PureComponent {
         this.audioEngine = new AudioEngine();
         this.player = this.audioEngine.createPlayer();
     }
-    componentWillReceiveProps (newProps) {
-        // Stop playing sounds if the library closes without a mouseleave (e.g. by using the escape key)
-        if (this.player && !newProps.visible) this.player.stopAllSounds();
+    componentWillUnmount () {
+        this.player.stopAllSounds();
     }
     handleItemMouseEnter (soundItem) {
         const md5ext = soundItem._md5;
         const idParts = md5ext.split('.');
         const md5 = idParts[0];
         const vm = this.props.vm;
-        vm.runtime.storage.load(vm.runtime.storage.AssetType.Sound, md5).then(soundAsset => {
-            const sound = {
-                md5: md5ext,
-                name: soundItem.name,
-                format: soundItem.format,
-                data: soundAsset.data
-            };
-            return this.audioEngine.decodeSound(sound);
-        })
-        .then(soundId => {
-            this.player.playSound(soundId);
-        });
+        vm.runtime.storage.load(vm.runtime.storage.AssetType.Sound, md5)
+            .then(soundAsset => {
+                const sound = {
+                    md5: md5ext,
+                    name: soundItem.name,
+                    format: soundItem.format,
+                    data: soundAsset.data
+                };
+                return this.audioEngine.decodeSound(sound);
+            })
+            .then(soundId => {
+                this.player.playSound(soundId);
+            });
     }
     handleItemMouseLeave () {
         this.player.stopAllSounds();
@@ -75,7 +75,6 @@ class SoundLibrary extends React.PureComponent {
             <LibraryComponent
                 data={soundLibraryThumbnailData}
                 title="Sound Library"
-                visible={this.props.visible}
                 onItemMouseEnter={this.handleItemMouseEnter}
                 onItemMouseLeave={this.handleItemMouseLeave}
                 onItemSelected={this.handleItemSelected}
@@ -87,7 +86,6 @@ class SoundLibrary extends React.PureComponent {
 
 SoundLibrary.propTypes = {
     onRequestClose: PropTypes.func,
-    visible: PropTypes.bool,
     vm: PropTypes.instanceOf(VM).isRequired
 };
 

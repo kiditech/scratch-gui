@@ -1,20 +1,21 @@
-/* eslint-env jest */
-import React from 'react'; // eslint-disable-line no-unused-vars
-import {mountWithIntl} from '../../helpers/intl-helpers';
+import React from 'react';
+import {mountWithIntl} from '../../helpers/intl-helpers.jsx';
 import configureStore from 'redux-mock-store';
 import mockAudioBufferPlayer from '../../__mocks__/audio-buffer-player.js';
-import SoundEditor from '../../../src/containers/sound-editor'; // eslint-disable-line no-unused-vars
-// eslint-disable-next-line no-unused-vars
+import mockAudioEffects from '../../__mocks__/audio-effects.js';
+
+import SoundEditor from '../../../src/containers/sound-editor';
 import SoundEditorComponent from '../../../src/components/sound-editor/sound-editor';
 
 jest.mock('../../../src/lib/audio/audio-buffer-player', () => mockAudioBufferPlayer);
+jest.mock('../../../src/lib/audio/audio-effects', () => mockAudioEffects);
 
 describe('Sound Editor Container', () => {
     const mockStore = configureStore();
     let store;
     let soundIndex;
     let soundBuffer;
-    let samples = new Float32Array([0, 0, 0]); // eslint-disable-line no-undef
+    const samples = new Float32Array([0, 0, 0]); // eslint-disable-line no-undef
     let vm;
 
     beforeEach(() => {
@@ -37,7 +38,12 @@ describe('Sound Editor Container', () => {
     });
 
     test('should pass the correct data to the component from the store', () => {
-        const wrapper = mountWithIntl(<SoundEditor store={store} soundIndex={soundIndex} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
         const componentProps = wrapper.find(SoundEditorComponent).props();
         // Data retreived and processed by the `connect` with the store
         expect(componentProps.name).toEqual('first name');
@@ -51,7 +57,12 @@ describe('Sound Editor Container', () => {
     });
 
     test('it plays when clicked and stops when clicked again', () => {
-        const wrapper = mountWithIntl(<SoundEditor store={store} soundIndex={soundIndex} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
         const component = wrapper.find(SoundEditorComponent);
         // Ensure rendering doesn't start playing any sounds
         expect(mockAudioBufferPlayer.instance.play.mock.calls).toEqual([]);
@@ -70,7 +81,12 @@ describe('Sound Editor Container', () => {
     });
 
     test('it sets the component props for trimming and submits to the vm', () => {
-        const wrapper = mountWithIntl(<SoundEditor store={store} soundIndex={soundIndex} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
         const component = wrapper.find(SoundEditorComponent);
 
         component.props().onActivateTrim();
@@ -84,9 +100,159 @@ describe('Sound Editor Container', () => {
     });
 
     test('it submits name changes to the vm', () => {
-        const wrapper = mountWithIntl(<SoundEditor store={store} soundIndex={soundIndex} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
         const component = wrapper.find(SoundEditorComponent);
         component.props().onChangeName('hello');
         expect(vm.renameSound).toHaveBeenCalledWith(soundIndex, 'hello');
+    });
+
+    test('it handles an effect by submitting the result and playing', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onReverse(); // Could be any of the effects, just testing the end result
+        mockAudioEffects.instance._finishProcessing(soundBuffer);
+        expect(mockAudioBufferPlayer.instance.play).toHaveBeenCalled();
+        expect(vm.updateSoundBuffer).toHaveBeenCalled();
+    });
+
+    test('it handles reverse effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onReverse();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.REVERSE);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles louder effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onLouder();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.LOUDER);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles softer effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onSofter();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.SOFTER);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles faster effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onFaster();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.FASTER);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles slower effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onSlower();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.SLOWER);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles echo effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onEcho();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.ECHO);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('it handles robot effect correctly', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        component.props().onRobot();
+        expect(mockAudioEffects.instance.name).toEqual(mockAudioEffects.effectTypes.ROBOT);
+        expect(mockAudioEffects.instance.process).toHaveBeenCalled();
+    });
+
+    test('undo/redo functionality', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        // Undo and redo should be disabled initially
+        expect(component.prop('canUndo')).toEqual(false);
+        expect(component.prop('canRedo')).toEqual(false);
+
+        // Submitting new samples should make it possible to undo
+        component.props().onActivateTrim(); // Activate trimming
+        component.props().onActivateTrim(); // Submit new samples by calling again
+        wrapper.update();
+        expect(component.prop('canUndo')).toEqual(true);
+        expect(component.prop('canRedo')).toEqual(false);
+
+        // Undoing should make it possible to redo and not possible to undo again
+        component.props().onUndo();
+        wrapper.update();
+        expect(component.prop('canUndo')).toEqual(false);
+        expect(component.prop('canRedo')).toEqual(true);
+
+        // Redoing should make it possible to undo and not possible to redo again
+        component.props().onRedo();
+        wrapper.update();
+        expect(component.prop('canUndo')).toEqual(true);
+        expect(component.prop('canRedo')).toEqual(false);
+
+        // New submission should clear the redo stack
+        component.props().onUndo(); // Undo to go back to a state where redo is enabled
+        wrapper.update();
+        expect(component.prop('canRedo')).toEqual(true);
+        component.props().onActivateTrim(); // Activate trimming
+        component.props().onActivateTrim(); // Submit new samples by calling again
+        expect(component.prop('canRedo')).toEqual(false);
     });
 });

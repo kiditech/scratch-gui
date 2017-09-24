@@ -18,7 +18,9 @@ module.exports = {
     },
     devtool: 'cheap-module-source-map',
     entry: {
-        gui: './src/lib.js'
+        gui: './src/index.js',
+        blocksonly: './src/examples/blocks-only.jsx',
+        player: './src/examples/player.jsx'
     },
     output: {
         path: path.resolve(__dirname, 'build'),
@@ -75,12 +77,34 @@ module.exports = {
             'process.env.DEBUG': Boolean(process.env.DEBUG)
         }),
         new HtmlWebpackPlugin({
+            chunks: ['lib', 'gui'],
             template: 'src/index.ejs',
             title: 'Scratch 3.0 GUI'
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['lib', 'blocksonly'],
+            template: 'src/index.ejs',
+            filename: 'blocks-only.html',
+            title: 'Scratch 3.0 GUI: Blocks Only Example'
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['lib', 'player'],
+            template: 'src/index.ejs',
+            filename: 'player.html',
+            title: 'Scratch 3.0 GUI: Player Example'
         }),
         new CopyWebpackPlugin([{
             from: 'node_modules/scratch-blocks/media',
             to: 'static/blocks-media'
+        }]),
+        new CopyWebpackPlugin([{
+            from: 'extensions/**',
+            to: 'static',
+            context: 'src/examples'
+        }]),
+        new CopyWebpackPlugin([{
+            from: 'extension-worker.{js,js.map}',
+            context: 'node_modules/scratch-vm/dist/web'
         }])
     ].concat(process.env.NODE_ENV === 'production' ? [
         new webpack.optimize.UglifyJsPlugin({

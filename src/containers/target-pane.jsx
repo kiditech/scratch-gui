@@ -4,10 +4,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {
-    openBackdropLibrary,
     openSpriteLibrary,
     closeBackdropLibrary,
     closeCostumeLibrary,
+    closeExtensionLibrary,
     closeSoundLibrary,
     closeSpriteLibrary
 } from '../reducers/modals';
@@ -92,13 +92,10 @@ const mapStateToProps = state => ({
     soundLibraryVisible: state.modals.soundLibrary,
     spriteLibraryVisible: state.modals.spriteLibrary,
     costumeLibraryVisible: state.modals.costumeLibrary,
-    backdropLibraryVisible: state.modals.backdropLibrary
+    backdropLibraryVisible: state.modals.backdropLibrary,
+    extensionLibraryVisible: state.modals.extensionLibrary
 });
 const mapDispatchToProps = dispatch => ({
-    onNewBackdropClick: e => {
-        e.preventDefault();
-        dispatch(openBackdropLibrary());
-    },
     onNewSpriteClick: e => {
         e.preventDefault();
         dispatch(openSpriteLibrary());
@@ -108,6 +105,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onRequestCloseCostumeLibrary: () => {
         dispatch(closeCostumeLibrary());
+    },
+    onRequestCloseExtensionLibrary: () => {
+        dispatch(closeExtensionLibrary());
     },
     onRequestCloseSoundLibrary: () => {
         dispatch(closeSoundLibrary());

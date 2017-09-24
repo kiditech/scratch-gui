@@ -1,12 +1,13 @@
-/* eslint-env jest */
-import React from 'react'; // eslint-disable-line no-unused-vars
-import {mountWithIntl, componentWithIntl} from '../../helpers/intl-helpers';
-import SoundEditor from '../../../src/components/sound-editor/sound-editor'; // eslint-disable-line no-unused-vars
+import React from 'react';
+import {mountWithIntl, componentWithIntl} from '../../helpers/intl-helpers.jsx';
+import SoundEditor from '../../../src/components/sound-editor/sound-editor';
 
 describe('Sound Editor Component', () => {
     let props;
     beforeEach(() => {
         props = {
+            canUndo: true,
+            canRedo: false,
             chunkLevels: [1, 2, 3],
             name: 'sound name',
             playhead: 0.5,
@@ -15,6 +16,7 @@ describe('Sound Editor Component', () => {
             onActivateTrim: jest.fn(),
             onChangeName: jest.fn(),
             onPlay: jest.fn(),
+            onRedo: jest.fn(),
             onReverse: jest.fn(),
             onSofter: jest.fn(),
             onLouder: jest.fn(),
@@ -24,7 +26,8 @@ describe('Sound Editor Component', () => {
             onSlower: jest.fn(),
             onSetTrimEnd: jest.fn(),
             onSetTrimStart: jest.fn(),
-            onStop: jest.fn()
+            onStop: jest.fn(),
+            onUndo: jest.fn()
         };
     });
 
@@ -34,38 +37,65 @@ describe('Sound Editor Component', () => {
     });
 
     test('trim button appears when trims are null', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} trimStart={null} trimEnd={null} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                trimEnd={null}
+                trimStart={null}
+            />
+        );
         wrapper.find('button[title="Trim"]').simulate('click');
         expect(props.onActivateTrim).toHaveBeenCalled();
     });
 
     test('save button appears when trims are not null', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} trimStart={0.25} trimEnd={0.75} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                trimEnd={0.75}
+                trimStart={0.25}
+            />
+        );
         wrapper.find('button[title="Save"]').simulate('click');
         expect(props.onActivateTrim).toHaveBeenCalled();
     });
 
     test('play button appears when playhead is null', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} playhead={null} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                playhead={null}
+            />
+        );
         wrapper.find('button[title="Play"]').simulate('click');
         expect(props.onPlay).toHaveBeenCalled();
     });
 
     test('stop button appears when playhead is not null', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} playhead={0.5} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                playhead={0.5}
+            />
+        );
         wrapper.find('button[title="Stop"]').simulate('click');
         expect(props.onStop).toHaveBeenCalled();
     });
 
     test('submitting name calls the callback', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor {...props} />
+        );
         wrapper.find('input')
             .simulate('change', {target: {value: 'hello'}})
             .simulate('blur');
         expect(props.onChangeName).toHaveBeenCalled();
     });
+
     test('effect buttons call the correct callbacks', () => {
-        const wrapper = mountWithIntl(<SoundEditor {...props} />);
+        const wrapper = mountWithIntl(
+            <SoundEditor {...props} />
+        );
 
         wrapper.find('[children="Reverse"]').simulate('click');
         expect(props.onReverse).toHaveBeenCalled();
@@ -87,5 +117,42 @@ describe('Sound Editor Component', () => {
 
         wrapper.find('[children="Softer"]').simulate('click');
         expect(props.onSofter).toHaveBeenCalled();
+    });
+
+    test('undo and redo buttons can be disabled by canUndo/canRedo', () => {
+        let wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                canUndo
+                canRedo={false}
+            />
+        );
+        expect(wrapper.find('button[title="Undo"]').prop('disabled')).toBe(false);
+        expect(wrapper.find('button[title="Redo"]').prop('disabled')).toBe(true);
+
+        wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                canRedo
+                canUndo={false}
+            />
+        );
+        expect(wrapper.find('button[title="Undo"]').prop('disabled')).toBe(true);
+        expect(wrapper.find('button[title="Redo"]').prop('disabled')).toBe(false);
+    });
+
+    test.skip('undo/redo buttons call the correct callback', () => {
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                {...props}
+                canRedo
+                canUndo
+            />
+        );
+        wrapper.find('button[title="Undo"]').simulate('click');
+        expect(props.onUndo).toHaveBeenCalled();
+
+        wrapper.find('button[title="Redo"]').simulate('click');
+        expect(props.onRedo).toHaveBeenCalled();
     });
 });
