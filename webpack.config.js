@@ -18,7 +18,7 @@ module.exports = {
     },
     devtool: 'cheap-module-source-map',
     entry: {
-        gui: './src/index.js',
+        gui: './src/lib.js',
         blocksonly: './src/examples/blocks-only.jsx',
         player: './src/examples/player.jsx'
     },
