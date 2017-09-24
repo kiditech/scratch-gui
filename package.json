@@ -2,7 +2,7 @@
   "name": "scratch-gui",
   "version": "0.1.0",
   "description": "GraphicaL User Interface for creating and running Scratch 3.0 projects",
-  "main": "./build/gui.js",
+  "main": "./dist/gui.js",
   "scripts": {
     "build": "npm run clean && npm run i18n:msgs && webpack --progress --colors --bail",
     "clean": "rimraf ./build && mkdirp build",
