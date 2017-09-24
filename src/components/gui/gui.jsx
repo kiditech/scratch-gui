@@ -50,7 +50,6 @@ const GUIComponent = props => {
             className={styles.pageWrapper}
             {...componentProps}
         >
-            <MenuBar />
             <Box className={styles.bodyWrapper}>
                 <Box className={styles.flexWrapper}>
                     <Box className={styles.editorWrapper}>

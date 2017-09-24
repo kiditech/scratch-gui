@@ -18,12 +18,13 @@ module.exports = {
     },
     devtool: 'cheap-module-source-map',
     entry: {
-        lib: ['react', 'react-dom'],
-        gui: './src/index.jsx'
+        gui: './src/lib.js'
     },
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: '[name].js'
+        filename: '[name].js',
+        library: 'scratch-gui',
+        libraryTarget: 'commonjs2'
     },
     externals: {
         React: 'react',
@@ -72,10 +73,6 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"',
             'process.env.DEBUG': Boolean(process.env.DEBUG)
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'lib',
-            filename: 'lib.min.js'
         }),
         new HtmlWebpackPlugin({
             template: 'src/index.ejs',
