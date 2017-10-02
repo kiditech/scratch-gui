@@ -72,10 +72,6 @@ module.exports = {
         }]
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"',
-            'process.env.DEBUG': Boolean(process.env.DEBUG)
-        }),
         new HtmlWebpackPlugin({
             chunks: ['lib', 'gui'],
             template: 'src/index.ejs',
