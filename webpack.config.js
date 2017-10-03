@@ -72,6 +72,7 @@ module.exports = {
         }]
     },
     plugins: [
+        new webpack.EnvironmentPlugin(['NODE_ENV', 'DEBUG']),
         new HtmlWebpackPlugin({
             chunks: ['lib', 'gui'],
             template: 'src/index.ejs',
