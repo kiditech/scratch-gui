@@ -20,6 +20,7 @@ module.exports = {
     entry: {
         gui: './src/lib.js',
         blocksonly: './src/examples/blocks-only.jsx',
+        compatibilitytesting: './src/examples/compatibility-testing.jsx',
         player: './src/examples/player.jsx'
     },
     output: {
@@ -67,8 +68,8 @@ module.exports = {
             }]
         },
         {
-            test: /\.svg$/,
-            loader: 'svg-url-loader?noquotes'
+            test: /\.(svg|png|wav)$/,
+            loader: 'file-loader'
         }]
     },
     plugins: [
@@ -83,6 +84,12 @@ module.exports = {
             template: 'src/index.ejs',
             filename: 'blocks-only.html',
             title: 'Scratch 3.0 GUI: Blocks Only Example'
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['lib', 'compatibilitytesting'],
+            template: 'src/index.ejs',
+            filename: 'compatibility-testing.html',
+            title: 'Scratch 3.0 GUI: Compatibility Testing'
         }),
         new HtmlWebpackPlugin({
             chunks: ['lib', 'player'],
